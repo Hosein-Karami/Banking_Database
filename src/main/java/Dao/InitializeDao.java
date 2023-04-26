@@ -24,7 +24,7 @@ public class InitializeDao extends GeneralDao{
                 "CREATE TABLE transactions(transaction_type enum('deposit', 'withdraw', 'transfer', 'interest'),transaction_time timestamp,from_account BIGINT,to_account BIGINT,amount numeric(25,5),FOREIGN KEY(from_account) REFERENCES account(accountNumber),FOREIGN KEY(to_account) REFERENCES account(accountNumber));");
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement(
-                "CREATE TABLE latest_balances(accountNumber BIGINT,amount numeric(25,5),FOREIGN KEY(accountNumber) REFERENCES account(accountNumber));");
+                "CREATE TABLE latest_balances(accountNumber BIGINT,amount numeric(25,5),FOREIGN KEY(accountNumber) REFERENCES account(accountNumber),CHECK (amount >= 0));");
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement(
                 "CREATE TABLE snapshot_log(snapshot_id integer auto_increment primary key,snapshot_timestamp timestamp);");
