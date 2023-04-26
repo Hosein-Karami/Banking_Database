@@ -3,8 +3,6 @@ package Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.Date;
-
 @AllArgsConstructor
 @Getter
 public class Account {
@@ -15,7 +13,7 @@ public class Account {
     private String firstName;
     private String lastName;
     private long nationalId;
-    private Date birthdate;
+    private String birthdate;
     private AccountType type;
     private double interestRate;
 

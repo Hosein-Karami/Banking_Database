@@ -6,6 +6,7 @@ import QueryBuilder.AccountQuery;
 public class AccountService {
 
     private static AccountService accountService = null;
+    private final FileService fileService = FileService.getInstance();
 
     public static AccountService getInstance(){
         if(accountService == null)
@@ -16,8 +17,7 @@ public class AccountService {
     private AccountService(){}
 
     public void register(Account account){
-        String targetQuery = AccountQuery.register(account);
-
+        fileService.saveQuery(AccountQuery.register(account));
     }
 
 }

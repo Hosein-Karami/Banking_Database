@@ -6,8 +6,6 @@ import Exceptions.FatherException;
 import Exceptions.LengthException;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Scanner;
 
 public class AccountChecker {
@@ -23,6 +21,7 @@ public class AccountChecker {
 
     private AccountChecker(){}
 
+
     public Account getProperAccount(){
         try {
             System.out.print("Enter username(length of username should between 1 and 40) : ");
@@ -37,7 +36,7 @@ public class AccountChecker {
             System.out.print("Enter your national_id : ");
             long national_id = getProperLongInformation(10);
             System.out.print("Enter your birthdate(yyyy-mm-dd) : ");
-            Date birthdate = getProperDate();
+            String birthdate = getProperDate();
             AccountType accountType = getProperType();
             //TODO design interest_rate
             return new Account(username,password,accountNumber,firstname,lastname,national_id,birthdate,accountType,0);
@@ -63,10 +62,8 @@ public class AccountChecker {
         return info;
     }
 
-    private Date getProperDate() throws ParseException {
-        String birthdate = scanner.nextLine();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        return dateFormat.parse(birthdate);
+    private String getProperDate() throws ParseException {
+        return scanner.nextLine();
     }
 
     private AccountType getProperType(){
