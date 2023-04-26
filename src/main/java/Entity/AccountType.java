@@ -1,5 +1,13 @@
 package Entity;
 
 public enum AccountType {
-    client,employee
+    client,employee;
+
+    public static String getType(AccountType accountType){
+        if(accountType == AccountType.client)
+            return "Client";
+        else
+            return "Employee";
+    }
+
 }

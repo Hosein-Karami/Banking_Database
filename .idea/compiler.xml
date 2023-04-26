@@ -11,6 +11,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="Banking-Database" />
+        <module name="Banking_Database" />
       </profile>
     </annotationProcessing>
   </component>

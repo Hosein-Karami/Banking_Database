@@ -1,19 +1,21 @@
 package Entity;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
-@Data
+@AllArgsConstructor
+@Getter
 public class Account {
 
     private String username;
-    private String accountId;
     private String password;
+    private long accountNumber;
     private String firstName;
     private String lastName;
-    private String nationalId;
-    private LocalDateTime birthdate;
+    private long nationalId;
+    private Date birthdate;
     private AccountType type;
     private double interestRate;
 

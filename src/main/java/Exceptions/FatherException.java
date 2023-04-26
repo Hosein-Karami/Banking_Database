@@ -1,15 +1,14 @@
 package Exceptions;
 
+import lombok.Getter;
+
 public class FatherException extends RuntimeException{
 
-    private String exceptionMessage;
+    @Getter
+    private final String exceptionMessage;
 
     protected FatherException(String exceptionMessage){
         this.exceptionMessage = exceptionMessage;
-    }
-
-    public String getExceptionMessage(){
-        return exceptionMessage;
     }
 
 }
