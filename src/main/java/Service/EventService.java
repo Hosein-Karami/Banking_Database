@@ -6,22 +6,22 @@ import java.io.*;
 import java.sql.SQLException;
 import java.util.Scanner;
 
-public class FileService {
+public class EventService {
 
-    private static FileService fileService = null;
-    private final File file = new File("Queries.txt");;
+    private static EventService fileService = null;
+    private final File file = new File("Queries.txt");
     private final QueryRunner queryRunner = QueryRunner.getInstance();
 
-    public static FileService getInstance(){
+    public static EventService getInstance(){
         if(fileService == null)
-            fileService = new FileService();
+            fileService = new EventService();
         return fileService;
     }
 
-    private FileService(){}
+    private EventService(){}
 
 
-    public void saveQuery(String query){
+    public void saveEvent(String query){
         try {
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.write(query);
@@ -31,7 +31,7 @@ public class FileService {
         }
     }
 
-    public void runQueries(){
+    public void runEvents(){
         try {
             Scanner scanner = new Scanner(file);
             String query;

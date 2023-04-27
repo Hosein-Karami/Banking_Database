@@ -12,7 +12,7 @@ public class InitializeDao extends GeneralDao{
 
     private void makeTables() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(
-                "CREATE TABLE account(account_id varchar(16) primary key,username varchar(40) unique, accountNumber BIGINT,password BLOB,salt BLOB,first_name varchar(40),last_name varchar(40),national_id BIGINT, date_of_birth date,account_type enum('client','employee'),interest_rate numeric(4,2));");
+                "CREATE TABLE account(account_id varchar(16) primary key,username varchar(40) unique, accountNumber BIGINT,password BLOB,salt BLOB NOT NULL,first_name varchar(40),last_name varchar(40),national_id BIGINT, date_of_birth date,account_type enum('client','employee'),interest_rate numeric(4,2));");
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement(
                 "CREATE TABLE login_log(username varchar(40),login_time timestamp,FOREIGN KEY(username) REFERENCES account(username));");
@@ -32,12 +32,14 @@ public class InitializeDao extends GeneralDao{
     }
 
     private void makeProcedures() throws SQLException {
-        hashPasswordProcedure();
+        hashPassword();
         register();
+        checkPassword();
+        loginLog();
     }
 
-    private void hashPasswordProcedure() throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE GenerateSaltedHashPassword (IN password VARCHAR(40), OUT salt BLOB, OUT hashed_password VARBINARY(64))\n" +
+    private void hashPassword() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE GenerateSaltedHashPassword (IN password VARCHAR(40), OUT salt BLOB, OUT hashed_password BLOB)\n" +
                 "BEGIN\n" +
                 "  -- Generate a random salt\n" +
                 "  SET salt = UNHEX(SHA2(RAND(), 256));\n" +
@@ -59,13 +61,41 @@ public class InitializeDao extends GeneralDao{
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement("CREATE TRIGGER generate_user_id\n" +
                 "BEFORE INSERT ON account\n" +
-                "FOR EACH ROW\n" +
-                "BEGIN\n" +
+                " FOR EACH ROW\n" +
+                " BEGIN\n" +
                 "    SET NEW.account_id = CONCAT(\n" +
                 "        LEFT(NEW.first_name, 8),\n" +
                 "        LEFT(NEW.last_name, 8),\n" +
                 "        SUBSTRING(MD5(CONCAT(NEW.first_name, NEW.last_name, NOW())), 1, 4)\n" +
                 "    );\n" +
+                " END;");
+        preparedStatement.execute();
+    }
+
+    private void checkPassword() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE CheckPassword(IN input_username VARCHAR(40), IN input_password VARCHAR(40), OUT is_correct BOOL)\n" +
+                "BEGIN\n" +
+                "  DECLARE hashed_password BLOB;\n" +
+                "  DECLARE salt_value BLOB;\n" +
+                "  DECLARE input_hash BLOB;\n" +
+                "  -- Get the stored salt and hashed password for the user\n" +
+                "  SELECT salt, password FROM account WHERE username = input_username INTO salt_value, hashed_password;\n" +
+                "  -- Hash the input password with the stored salt\n" +
+                "  SET input_hash = UNHEX(SHA2(CONCAT(input_password, HEX(salt_value)), 256));\n" +
+                "  -- Compare the input hash with the stored hashed password\n" +
+                "  IF input_hash = hashed_password THEN\n" +
+                "    SET is_correct = true;\n" +
+                "  ELSE\n" +
+                "    SET is_correct = false;\n" +
+                "  END IF;\n" +
+                "END;");
+        preparedStatement.execute();
+    }
+
+    private void loginLog() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE LoginLog(IN username VARCHAR(40),IN login_time TIMESTAMP)\n" +
+                "BEGIN\n" +
+                "  INSERT INTO login_log VALUES(username,login_time);\n" +
                 "END;");
         preparedStatement.execute();
     }
