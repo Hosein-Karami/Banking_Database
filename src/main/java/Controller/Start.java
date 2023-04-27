@@ -11,6 +11,7 @@ public class Start {
         int choice = NumberChecker.getProperNumber(1,3);
         if(choice == 1)
             accountController.register();
+        
     }
 
 }

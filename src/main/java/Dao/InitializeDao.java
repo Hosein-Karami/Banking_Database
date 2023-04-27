@@ -53,11 +53,21 @@ public class InitializeDao extends GeneralDao{
                 "  DECLARE salt BLOB;\n" +
                 "  DECLARE hashed_password BLOB;\n" +
                 "  CALL GenerateSaltedHashPassword(password,salt,hashed_password);\n" +
-                "  INSERT INTO account VALUES ('2323232323232323',username,accountNumber,hashed_password,salt,first_name,last_name,national_id,date_of_birth,account_type,interest_rate);\n" +
+                "  INSERT INTO account VALUES (NULL,username,accountNumber,hashed_password,salt,first_name,last_name,national_id,date_of_birth,account_type,interest_rate);\n" +
                 "  INSERT INTO latest_balances VALUES (accountNumber,0);\n" +
                 "END;");
         preparedStatement.execute();
+        preparedStatement = connection.prepareStatement("CREATE TRIGGER generate_user_id\n" +
+                "BEFORE INSERT ON account\n" +
+                "FOR EACH ROW\n" +
+                "BEGIN\n" +
+                "    SET NEW.account_id = CONCAT(\n" +
+                "        LEFT(NEW.first_name, 8),\n" +
+                "        LEFT(NEW.last_name, 8),\n" +
+                "        SUBSTRING(MD5(CONCAT(NEW.first_name, NEW.last_name, NOW())), 1, 4)\n" +
+                "    );\n" +
+                "END;");
+        preparedStatement.execute();
     }
-
 
 }
