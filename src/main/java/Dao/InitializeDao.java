@@ -5,6 +5,8 @@ import java.sql.SQLException;
 
 public class InitializeDao extends GeneralDao{
 
+    public InitializeDao() throws SQLException {}
+
     public void initialize() throws SQLException {
         makeTables();
         makeProcedures();
@@ -12,7 +14,7 @@ public class InitializeDao extends GeneralDao{
 
     private void makeTables() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(
-                "CREATE TABLE account(account_id varchar(16) primary key,username varchar(40) unique, accountNumber BIGINT,password BLOB,salt BLOB NOT NULL,first_name varchar(40),last_name varchar(40),national_id BIGINT, date_of_birth date,account_type enum('client','employee'),interest_rate numeric(4,2));");
+                "CREATE TABLE account(account_id varchar(16) primary key,username varchar(40) unique NOT NULL, accountNumber BIGINT,password BLOB NOT NULL,salt BLOB NOT NULL,first_name varchar(40) NOT NULL ,last_name varchar(40) NOT NULL ,national_id BIGINT NOT NULL, date_of_birth date,account_type enum('client','employee'),interest_rate numeric(4,2));");
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement(
                 "CREATE TABLE login_log(username varchar(40),login_time timestamp,FOREIGN KEY(username) REFERENCES account(username));");
@@ -21,10 +23,10 @@ public class InitializeDao extends GeneralDao{
                 "CREATE INDEX idx_account_id ON account (accountNumber);");
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement(
-                "CREATE TABLE transactions(transaction_type enum('deposit', 'withdraw', 'transfer', 'interest'),transaction_time timestamp,from_account BIGINT,to_account BIGINT,amount numeric(25,5),FOREIGN KEY(from_account) REFERENCES account(accountNumber),FOREIGN KEY(to_account) REFERENCES account(accountNumber));");
+                "CREATE TABLE transactions(transaction_type enum('deposit', 'withdraw', 'transfer', 'interest'),transaction_time timestamp,from_account BIGINT NOT NULL,to_account BIGINT NOT NULL,amount numeric(25,5) NOT NULL,FOREIGN KEY(from_account) REFERENCES account(accountNumber),FOREIGN KEY(to_account) REFERENCES account(accountNumber));");
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement(
-                "CREATE TABLE latest_balances(accountNumber BIGINT,amount numeric(25,5),FOREIGN KEY(accountNumber) REFERENCES account(accountNumber),CHECK (amount >= 0));");
+                "CREATE TABLE latest_balances(accountNumber BIGINT NOT NULL,amount numeric(25,5),FOREIGN KEY(accountNumber) REFERENCES account(accountNumber),CHECK (amount >= 0));");
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement(
                 "CREATE TABLE snapshot_log(snapshot_id integer auto_increment primary key,snapshot_timestamp timestamp);");

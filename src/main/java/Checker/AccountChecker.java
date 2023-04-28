@@ -65,7 +65,7 @@ public class AccountChecker {
                 System.out.print("Invalid account number,try again : ");
                 scanner.nextLine();
             }catch (Exception e){
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }
     }

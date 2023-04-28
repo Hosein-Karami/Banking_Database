@@ -4,7 +4,6 @@ import Dao.AccountDao;
 import Dao.QueryRunner;
 import Entity.Account;
 import QueryBuilder.AccountQuery;
-import QueryBuilder.LoginQuery;
 
 import java.sql.SQLException;
 
@@ -27,9 +26,9 @@ public class AccountService {
     }
 
     public boolean login(String username,String password) throws SQLException {
-        boolean authenticate = accountDao.login(username,password);
+        boolean authenticate = accountDao.checkPassword(username,password);
         if(authenticate)
-            queryRunner.run(LoginQuery.loginLog(username));
+            queryRunner.run(AccountQuery.loginLog(username));
         return authenticate;
     }
 
