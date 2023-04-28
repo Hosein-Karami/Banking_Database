@@ -5,8 +5,6 @@ import java.sql.SQLException;
 
 public class InitializeDao extends GeneralDao{
 
-    public InitializeDao() throws SQLException {}
-
     public void initialize() throws SQLException {
         makeTables();
         makeProcedures();

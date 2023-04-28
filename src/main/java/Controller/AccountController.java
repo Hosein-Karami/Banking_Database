@@ -1,6 +1,8 @@
 package Controller;
 
 import Checker.AccountChecker;
+import Controller.Dashboard.DashboardFactory;
+import Entity.AccountType;
 import Service.AccountService;
 
 import java.sql.SQLException;
@@ -39,12 +41,20 @@ public class AccountController {
         try {
             boolean authenticate = accountService.login(username,password);
             if(authenticate)
-                //TODO design dashboard
-                System.out.println("salam");
+                joinUserToDashboard(username);
             else
                 System.out.println("Username or password is false\n");
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void joinUserToDashboard(String username){
+        try {
+            AccountType accountType = accountService.getAccountType(username);
+            DashboardFactory.getProperDashboard(accountType,username).run();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -3,6 +3,7 @@ package Service;
 import Dao.AccountDao;
 import Dao.QueryRunner;
 import Entity.Account;
+import Entity.AccountType;
 import QueryBuilder.AccountQuery;
 
 import java.sql.SQLException;
@@ -30,6 +31,10 @@ public class AccountService {
         if(authenticate)
             queryRunner.run(AccountQuery.loginLog(username));
         return authenticate;
+    }
+
+    public AccountType getAccountType(String username) throws SQLException {
+        return accountDao.getAccountType(username);
     }
 
 }

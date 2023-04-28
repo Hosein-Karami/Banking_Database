@@ -1,8 +1,8 @@
 package Dao;
 
-import java.sql.CallableStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import Entity.AccountType;
+
+import java.sql.*;
 
 public class AccountDao extends GeneralDao{
 
@@ -23,6 +23,14 @@ public class AccountDao extends GeneralDao{
         statement.registerOutParameter(3, Types.BOOLEAN);
         statement.execute();
         return statement.getBoolean(3);
+    }
+
+    public AccountType getAccountType(String username) throws SQLException {
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT account_type FROM account WHERE username='"+username+"'");
+        resultSet.next();
+        String accountType = resultSet.getString(1);
+        return AccountType.getAccountType(accountType);
     }
 
 }
