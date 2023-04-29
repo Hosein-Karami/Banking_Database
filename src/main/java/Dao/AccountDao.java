@@ -33,12 +33,20 @@ public class AccountDao extends GeneralDao{
         return AccountType.getAccountType(accountType);
     }
 
-    public double getBalance(String username) throws SQLException {
+    public double getBalance(long accountNumber) throws SQLException {
         CallableStatement statement = connection.prepareCall("CALL GetBalance(?,?);");
-        statement.setString(1,username);
+        statement.setLong(1,accountNumber);
         statement.registerOutParameter(2,Types.NUMERIC);
         statement.execute();
         return statement.getDouble(2);
+    }
+
+    public long getAccountNumber(String username) throws SQLException {
+        CallableStatement statement = connection.prepareCall("CALL GetAccountNumber(?,?)");
+        statement.setString(1,username);
+        statement.registerOutParameter(2,Types.BIGINT);
+        statement.execute();
+        return statement.getLong(2);
     }
 
 }

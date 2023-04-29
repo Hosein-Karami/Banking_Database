@@ -3,12 +3,21 @@ package Controller.Dashboard;
 import Checker.NumberChecker;
 import Service.AccountService;
 
+import java.sql.SQLException;
+
 public class ClientDashboard extends GeneralDashboard {
 
     private AccountService accountService = AccountService.getInstance();
 
+    private long accountNumber;
+
     public ClientDashboard(String username) {
         super(username);
+        try {
+            accountNumber = accountService.getAccountNumber(username);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void run(){
@@ -25,7 +34,7 @@ public class ClientDashboard extends GeneralDashboard {
 
     private void checkBalance(){
         try{
-            System.out.println("Balance : " + accountService.getBalance(username));
+            System.out.println("Balance : " + accountService.getBalance(accountNumber));
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -37,8 +37,12 @@ public class AccountService {
         return accountDao.getAccountType(username);
     }
 
-    public double getBalance(String username) throws SQLException {
-        return accountDao.getBalance(username);
+    public double getBalance(long accountNumber) throws SQLException {
+        return accountDao.getBalance(accountNumber);
+    }
+
+    public long getAccountNumber(String username) throws SQLException {
+        return accountDao.getAccountNumber(username);
     }
 
 }
