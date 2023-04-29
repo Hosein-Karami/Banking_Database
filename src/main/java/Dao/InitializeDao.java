@@ -38,6 +38,7 @@ public class InitializeDao extends GeneralDao{
         loginLog();
         getAccountNumber();
         getAccountBalance();
+        updateLogSnapshot();
     }
 
     private void hashPassword() throws SQLException {
