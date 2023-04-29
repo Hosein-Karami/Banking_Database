@@ -12,7 +12,7 @@ public class InitializeDao extends GeneralDao{
 
     private void makeTables() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(
-                "CREATE TABLE account(account_id varchar(16) primary key,username varchar(40) unique NOT NULL, accountNumber BIGINT,password BLOB NOT NULL,salt BLOB NOT NULL,first_name varchar(40) NOT NULL ,last_name varchar(40) NOT NULL ,national_id BIGINT NOT NULL, date_of_birth date,account_type enum('client','employee'),interest_rate numeric(4,2));");
+                "CREATE TABLE account(account_id varchar(16) primary key,username varchar(40) unique NOT NULL, accountNumber BIGINT NOT NULL,password BLOB NOT NULL,salt BLOB NOT NULL,first_name varchar(40) NOT NULL ,last_name varchar(40) NOT NULL ,national_id BIGINT NOT NULL, date_of_birth date,account_type enum('client','employee'),interest_rate numeric(4,2));");
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement(
                 "CREATE TABLE login_log(username varchar(40),login_time timestamp,FOREIGN KEY(username) REFERENCES account(username));");
@@ -36,6 +36,8 @@ public class InitializeDao extends GeneralDao{
         register();
         checkPassword();
         loginLog();
+        getAccountNumber();
+        getAccountBalance();
     }
 
     private void hashPassword() throws SQLException {
@@ -96,6 +98,32 @@ public class InitializeDao extends GeneralDao{
         PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE LoginLog(IN username VARCHAR(40),IN login_time TIMESTAMP)\n" +
                 "BEGIN\n" +
                 "  INSERT INTO login_log VALUES(username,login_time);\n" +
+                "END;");
+        preparedStatement.execute();
+    }
+
+    private void getAccountBalance() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE GetBalance(IN client_username VARCHAR(40),OUT balance numeric(25,5))\n" +
+                "BEGIN\n" +
+                "  DECLARE account_number BIGINT;\n" +
+                "  CALL GetAccountNumber(client_username,account_number);\n" +
+                "  SELECT amount FROM latest_balances WHERE accountNumber=account_number INTO balance;\n" +
+                "END;");
+        preparedStatement.execute();
+    }
+
+    private void getAccountNumber() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE GetAccountNumber(IN client_username VARCHAR(40),OUT account_number BIGINT)\n" +
+                "BEGIN\n" +
+                "  SELECT accountNumber FROM account WHERE username=client_username INTO account_number;\n" +
+                "END;");
+        preparedStatement.execute();
+    }
+
+    private void updateLogSnapshot() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE LogSnapshot()\n" +
+                "BEGIN\n" +
+                "  INSERT INTO snapshot_log SET snapshot_timestamp=NOW();\n" +
                 "END;");
         preparedStatement.execute();
     }

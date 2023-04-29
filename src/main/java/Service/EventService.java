@@ -1,6 +1,7 @@
 package Service;
 
 import Dao.QueryRunner;
+import Dao.SnapshotDao;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -11,6 +12,7 @@ public class EventService {
     private static EventService fileService = null;
     private final File file = new File("Queries.txt");
     private final QueryRunner queryRunner = QueryRunner.getInstance();
+    private final SnapshotDao snapshotDao = SnapshotDao.getInstance();
 
     public static EventService getInstance(){
         if(fileService == null)
@@ -31,20 +33,25 @@ public class EventService {
         }
     }
 
-    public void runEvents(){
-        try {
-            Scanner scanner = new Scanner(file);
-            String query;
-            while (scanner.hasNext()) {
-                query = scanner.nextLine();
+    public void runEvents() throws FileNotFoundException {
+        Scanner scanner = new Scanner(file);
+        String query;
+        while (scanner.hasNext()) {
+            query = scanner.nextLine();
+            try {
                 queryRunner.run(query);
+            }catch (SQLException e){
+                e.printStackTrace();
             }
-            PrintWriter writer = new PrintWriter(file);
-            writer.print("");
-            writer.close();
-        } catch (FileNotFoundException | SQLException e) {
+        }
+        try {
+            snapshotDao.logSnapshot();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+        PrintWriter writer = new PrintWriter(file);
+            writer.print("");
+            writer.close();
     }
 
 }
