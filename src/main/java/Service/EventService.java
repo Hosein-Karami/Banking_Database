@@ -14,19 +14,20 @@ public class EventService {
     private final QueryRunner queryRunner = QueryRunner.getInstance();
     private final SnapshotDao snapshotDao = SnapshotDao.getInstance();
 
-    public static EventService getInstance(){
+    public static EventService getInstance() {
         if(fileService == null)
             fileService = new EventService();
         return fileService;
     }
 
-    private EventService(){}
+    private EventService() {}
 
 
     public void saveEvent(String query){
         try {
-            FileWriter fileWriter = new FileWriter(file);
+            FileWriter fileWriter = new FileWriter(file,true);
             fileWriter.write(query);
+            fileWriter.flush();
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -36,14 +37,15 @@ public class EventService {
     public void runEvents() throws FileNotFoundException {
         Scanner scanner = new Scanner(file);
         String query;
-        while (scanner.hasNext()) {
+        do{
             query = scanner.nextLine();
+            System.out.println(query);
             try {
                 queryRunner.run(query);
             }catch (SQLException e){
-                e.printStackTrace();
+                System.out.println("Error : " + e.getMessage() + ", query : " + query);
             }
-        }
+        }while (scanner.hasNext());
         try {
             snapshotDao.logSnapshot();
         } catch (SQLException e) {

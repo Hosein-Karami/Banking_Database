@@ -27,7 +27,7 @@ public class AccountQuery {
         stringBuilder.append(AccountType.getType(account.getType()));
         stringBuilder.append("',");
         stringBuilder.append(account.getInterestRate());
-        stringBuilder.append(");");
+        stringBuilder.append(");\n");
         return stringBuilder.toString();
     }
 
@@ -38,7 +38,27 @@ public class AccountQuery {
         stringBuilder.append(username);
         stringBuilder.append("','");
         stringBuilder.append(timestamp);
-        stringBuilder.append("');");
+        stringBuilder.append("');\n");
+        return stringBuilder.toString();
+    }
+
+    public static String withdraw(long accountNumber,double amount){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("CALL Withdraw(");
+        stringBuilder.append(accountNumber);
+        stringBuilder.append(",");
+        stringBuilder.append(amount);
+        stringBuilder.append(");\n");
+        return stringBuilder.toString();
+    }
+
+    public static String deposit(long accountNumber,double amount){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("CALL Deposit(");
+        stringBuilder.append(accountNumber);
+        stringBuilder.append(",");
+        stringBuilder.append(amount);
+        stringBuilder.append(");\n");
         return stringBuilder.toString();
     }
 

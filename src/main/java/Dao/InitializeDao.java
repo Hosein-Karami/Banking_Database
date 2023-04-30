@@ -39,6 +39,9 @@ public class InitializeDao extends GeneralDao{
         getAccountNumber();
         getAccountBalance();
         updateLogSnapshot();
+        checkAccountNumberExistence();
+        depositToAccount();
+        withdrawFromAccount();
     }
 
     private void hashPassword() throws SQLException {
@@ -123,6 +126,42 @@ public class InitializeDao extends GeneralDao{
         PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE LogSnapshot()\n" +
                 "BEGIN\n" +
                 "  INSERT INTO snapshot_log SET snapshot_timestamp=NOW();\n" +
+                "END;");
+        preparedStatement.execute();
+    }
+
+    private void checkAccountNumberExistence() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE CheckAccountNumber(IN account_number BIGINT,OUT check_result BOOL)\n" +
+                "BEGIN\n" +
+                "  SELECT COUNT(*) FROM account WHERE accountNumber=account_number INTO check_result;\n" +
+                "END;");
+        preparedStatement.execute();
+    }
+
+    private void depositToAccount() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE Deposit(IN account_number BIGINT,IN deposit_amount numeric(25,5))\n" +
+                "BEGIN\n" +
+                "  DECLARE now_amount numeric(25,5);\n" +
+                "  DECLARE final_amount numeric(25,5);\n" +
+                "  SELECT amount FROM latest_balances WHERE accountNumber=account_number INTO now_amount;\n" +
+                "  SET final_amount = now_amount + deposit_amount;\n" +
+                "  UPDATE latest_balances SET amount=final_amount WHERE accountNumber=account_number;\n" +
+                "END;");
+        preparedStatement.execute();
+    }
+
+    private void withdrawFromAccount() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE Withdraw(IN account_number BIGINT,IN withdraw_amount numeric(25,5))\n" +
+                "BEGIN\n" +
+                "  DECLARE now_amount numeric(25,5);\n" +
+                "  DECLARE final_amount numeric(25,5);\n" +
+                "  SELECT amount FROM latest_balances WHERE accountNumber=account_number INTO now_amount;\n" +
+                "  SET final_amount = now_amount - withdraw_amount;\n" +
+                "  IF final_amount >= 0 THEN\n" +
+                "    UPDATE latest_balances SET amount=final_amount WHERE accountNumber=account_number;\n" +
+                "  ELSE" +
+                "    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Lack of balance,First increase your balance and try again';" +
+                "  END IF;\n" +
                 "END;");
         preparedStatement.execute();
     }

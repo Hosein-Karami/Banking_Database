@@ -14,13 +14,13 @@ public class AccountService {
     private final QueryRunner queryRunner = QueryRunner.getInstance();
     private final AccountDao accountDao = AccountDao.getInstance();
 
-    public static AccountService getInstance(){
+    public static AccountService getInstance() {
         if(accountService == null)
             accountService = new AccountService();
         return accountService;
     }
 
-    private AccountService(){}
+    private AccountService() {}
 
     public void register(Account account) throws SQLException {
         queryRunner.run(AccountQuery.register(account));
