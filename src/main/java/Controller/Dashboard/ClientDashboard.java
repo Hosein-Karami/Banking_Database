@@ -1,5 +1,6 @@
 package Controller.Dashboard;
 
+import Checker.AccountChecker;
 import Checker.NumberChecker;
 import QueryBuilder.AccountQuery;
 import Service.AccountService;
@@ -10,9 +11,10 @@ import java.util.Scanner;
 
 public class ClientDashboard extends GeneralDashboard {
 
-    private AccountService accountService = AccountService.getInstance();
-    private EventService eventService = EventService.getInstance();
+    private final AccountService accountService = AccountService.getInstance();
+    private final EventService eventService = EventService.getInstance();
     private final Scanner scanner = new Scanner(System.in);
+    private final AccountChecker accountChecker = AccountChecker.getInstance();
 
     private long accountNumber;
 
@@ -36,6 +38,8 @@ public class ClientDashboard extends GeneralDashboard {
                 deposit();
             else if(choice == 3)
                 withdraw();
+            else if(choice == 4)
+                transfer();
             else
                 break;
         }
@@ -68,6 +72,27 @@ public class ClientDashboard extends GeneralDashboard {
         else{
             eventService.saveEvent(AccountQuery.withdraw(accountNumber,amount));
             System.out.println("Done\n");
+        }
+    }
+
+    private void transfer(){
+        System.out.print("Enter target account number : ");
+        long targetAccountNumber = accountChecker.getProperLongInformation(16);
+        try {
+            if (accountService.checkAccountNumberExistence(targetAccountNumber)) {
+                System.out.print("Enter amount : ");
+                double amount = scanner.nextDouble();
+                if (amount < 0)
+                    System.out.println("Invalid amount");
+                else {
+                    eventService.saveEvent(AccountQuery.transfer(accountNumber, targetAccountNumber, amount));
+                    System.out.println("Done\n");
+                }
+            }
+            else
+                System.out.println("Invalid account number");
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 

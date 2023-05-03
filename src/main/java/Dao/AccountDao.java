@@ -35,7 +35,7 @@ public class AccountDao extends GeneralDao {
     }
 
     public double getBalance(long accountNumber) throws SQLException {
-        CallableStatement statement = connection.prepareCall("CALL GetBalance(?,?);");
+        CallableStatement statement = connection.prepareCall("CALL GetBalance(?,?)");
         statement.setLong(1, accountNumber);
         statement.registerOutParameter(2, Types.NUMERIC);
         statement.execute();
@@ -48,6 +48,14 @@ public class AccountDao extends GeneralDao {
         statement.registerOutParameter(2, Types.BIGINT);
         statement.execute();
         return statement.getLong(2);
+    }
+
+    public boolean checkAccountNumberExistence(long accountNumber) throws SQLException {
+        CallableStatement statement = connection.prepareCall("CALL CheckAccountNumber(?,?)");
+        statement.setLong(1,accountNumber);
+        statement.registerOutParameter(2,Types.BOOLEAN);
+        statement.execute();
+        return statement.getBoolean(2);
     }
 
 }

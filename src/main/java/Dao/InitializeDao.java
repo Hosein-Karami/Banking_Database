@@ -42,6 +42,7 @@ public class InitializeDao extends GeneralDao{
         checkAccountNumberExistence();
         depositToAccount();
         withdrawFromAccount();
+        transfer();
     }
 
     private void hashPassword() throws SQLException {
@@ -162,6 +163,17 @@ public class InitializeDao extends GeneralDao{
                 "  ELSE" +
                 "    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Lack of balance,First increase your balance and try again';" +
                 "  END IF;\n" +
+                "END;");
+        preparedStatement.execute();
+    }
+
+    private void transfer() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE Transfer(IN from_account_number BIGINT,IN to_account_number BIGINT,IN transfer_amount numeric(25,5))\n" +
+                "BEGIN\n" +
+                "  START TRANSACTION;\n" +
+                "    CALL Withdraw(from_account_number,transfer_amount);\n" +
+                "    CALL Deposit(to_account_number,transfer_amount);\n" +
+                "  COMMIT;\n" +
                 "END;");
         preparedStatement.execute();
     }

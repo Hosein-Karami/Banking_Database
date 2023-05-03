@@ -52,7 +52,7 @@ public class AccountChecker {
         }
     }
 
-    private long getProperLongInformation(int length) {
+    public long getProperLongInformation(int length) {
         long info;
         while(true) {
             try {
@@ -60,9 +60,9 @@ public class AccountChecker {
                 if ((Long.toString(info)).length() == length)
                     return info;
                 else
-                    System.out.print("The length of account number should be " + length + " : ");
+                    System.out.print("The length of number should be " + length + " : ");
             }catch (InputMismatchException e){
-                System.out.print("Invalid account number,try again : ");
+                System.out.print("Invalid number,try again : ");
                 scanner.nextLine();
             }catch (Exception e){
                 System.out.println(e.getMessage());

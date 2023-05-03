@@ -62,4 +62,16 @@ public class AccountQuery {
         return stringBuilder.toString();
     }
 
+    public static String transfer(long fromAccountNumber,long toAccountNumber,double amount){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("CALL Transfer(");
+        stringBuilder.append(fromAccountNumber);
+        stringBuilder.append(",");
+        stringBuilder.append(toAccountNumber);
+        stringBuilder.append(",");
+        stringBuilder.append(amount);
+        stringBuilder.append(");");
+        return stringBuilder.toString();
+    }
+
 }
