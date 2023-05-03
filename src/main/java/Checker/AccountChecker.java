@@ -19,7 +19,6 @@ public class AccountChecker {
 
     private AccountChecker(){}
 
-
     public Account getProperAccount() {
         System.out.print("Enter username(length of username should between 1 and 40) : ");
         String username = getProperStringInformation(40);
@@ -37,8 +36,9 @@ public class AccountChecker {
         System.out.print("Enter your birthdate(yyyy-mm-dd) : ");
         String birthdate = getProperDate();
         AccountType accountType = getProperType();
-        //TODO design interest_rate
-        return new Account(username,password,accountNumber,firstname,lastname,national_id,birthdate,accountType,0);
+        System.out.print("Enter interest rate : ");
+        double interestRate = getProperInterestRate();
+        return new Account(username,password,accountNumber,firstname,lastname,national_id,birthdate,accountType,interestRate);
     }
 
     private String getProperStringInformation(int maxLength){
@@ -81,6 +81,21 @@ public class AccountChecker {
             return AccountType.client;
         else
             return AccountType.employee;
+    }
+
+    private double getProperInterestRate(){
+        double interestRate;
+        while (true) {
+            try {
+                interestRate = scanner.nextDouble();
+                if(interestRate < 0)
+                    System.out.print("Invalid interest rate");
+                else
+                    return interestRate;
+            } catch (Exception e) {
+                System.out.println("Invalid interest rate");
+            }
+        }
     }
 
 }

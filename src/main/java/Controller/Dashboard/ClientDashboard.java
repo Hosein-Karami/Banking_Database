@@ -79,18 +79,14 @@ public class ClientDashboard extends GeneralDashboard {
         System.out.print("Enter target account number : ");
         long targetAccountNumber = accountChecker.getProperLongInformation(16);
         try {
-            if (accountService.checkAccountNumberExistence(targetAccountNumber)) {
-                System.out.print("Enter amount : ");
-                double amount = scanner.nextDouble();
-                if (amount < 0)
-                    System.out.println("Invalid amount");
-                else {
-                    eventService.saveEvent(AccountQuery.transfer(accountNumber, targetAccountNumber, amount));
-                    System.out.println("Done\n");
-                }
+            System.out.print("Enter amount : ");
+            double amount = scanner.nextDouble();
+            if (amount < 0)
+                System.out.println("Invalid amount");
+            else {
+                eventService.saveEvent(AccountQuery.transfer(accountNumber, targetAccountNumber, amount));
+                System.out.println("Done\n");
             }
-            else
-                System.out.println("Invalid account number");
         }catch (Exception e){
             e.printStackTrace();
         }

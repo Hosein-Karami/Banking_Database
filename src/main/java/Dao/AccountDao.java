@@ -50,12 +50,4 @@ public class AccountDao extends GeneralDao {
         return statement.getLong(2);
     }
 
-    public boolean checkAccountNumberExistence(long accountNumber) throws SQLException {
-        CallableStatement statement = connection.prepareCall("CALL CheckAccountNumber(?,?)");
-        statement.setLong(1,accountNumber);
-        statement.registerOutParameter(2,Types.BOOLEAN);
-        statement.execute();
-        return statement.getBoolean(2);
-    }
-
 }

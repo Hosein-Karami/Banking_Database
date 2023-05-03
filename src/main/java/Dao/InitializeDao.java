@@ -132,9 +132,13 @@ public class InitializeDao extends GeneralDao{
     }
 
     private void checkAccountNumberExistence() throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE CheckAccountNumber(IN account_number BIGINT,OUT check_result BOOL)\n" +
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE CheckAccountNumber(IN account_number BIGINT)\n" +
                 "BEGIN\n" +
+                "  DECLARE check_result integer;\n" +
                 "  SELECT COUNT(*) FROM account WHERE accountNumber=account_number INTO check_result;\n" +
+                "  IF check_result = 0 THEN" +
+                "    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Target account number does not exist';" +
+                "  END IF;\n" +
                 "END;");
         preparedStatement.execute();
     }
@@ -171,6 +175,7 @@ public class InitializeDao extends GeneralDao{
         PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE Transfer(IN from_account_number BIGINT,IN to_account_number BIGINT,IN transfer_amount numeric(25,5))\n" +
                 "BEGIN\n" +
                 "  START TRANSACTION;\n" +
+                "    CALL CheckAccountNumber(to_account_number);\n" +
                 "    CALL Withdraw(from_account_number,transfer_amount);\n" +
                 "    CALL Deposit(to_account_number,transfer_amount);\n" +
                 "  COMMIT;\n" +

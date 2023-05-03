@@ -45,8 +45,4 @@ public class AccountService {
         return accountDao.getAccountNumber(username);
     }
 
-    public boolean checkAccountNumberExistence(long accountNumber) throws SQLException {
-        return accountDao.checkAccountNumberExistence(accountNumber);
-    }
-
 }
