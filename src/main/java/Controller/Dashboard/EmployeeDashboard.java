@@ -3,8 +3,6 @@ package Controller.Dashboard;
 import Checker.NumberChecker;
 import Service.EventService;
 
-import java.io.FileNotFoundException;
-
 public class EmployeeDashboard extends GeneralDashboard {
 
     private EventService eventService = EventService.getInstance();
