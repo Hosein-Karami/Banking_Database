@@ -12,7 +12,7 @@ public class InitializeDao extends GeneralDao{
 
     private void makeTables() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(
-                "CREATE TABLE account(account_id varchar(16) primary key,username varchar(40) unique NOT NULL, accountNumber BIGINT,password BLOB NOT NULL,salt BLOB NOT NULL,first_name varchar(40) NOT NULL ,last_name varchar(40) NOT NULL ,national_id BIGINT NOT NULL, date_of_birth date,account_type enum('client','employee'),interest_rate numeric(4,2));");
+                "CREATE TABLE account(account_id varchar(16) primary key,username varchar(40) unique NOT NULL, accountNumber BIGINT,password BLOB NOT NULL,salt BLOB NOT NULL,first_name varchar(40) NOT NULL ,last_name varchar(40) NOT NULL ,national_id BIGINT NOT NULL, date_of_birth date,account_type enum('client','employee') NOT NULL,interest_rate numeric(4,2));");
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement(
                 "CREATE TABLE login_log(username varchar(40),login_time timestamp,FOREIGN KEY(username) REFERENCES account(username));");
@@ -21,7 +21,7 @@ public class InitializeDao extends GeneralDao{
                 "CREATE INDEX idx_account_id ON account (accountNumber);");
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement(
-                "CREATE TABLE transactions(transaction_type enum('deposit', 'withdraw', 'transfer', 'interest'),transaction_time timestamp,from_account BIGINT NOT NULL,to_account BIGINT NOT NULL,amount numeric(25,5) NOT NULL,FOREIGN KEY(from_account) REFERENCES account(accountNumber),FOREIGN KEY(to_account) REFERENCES account(accountNumber));");
+                "CREATE TABLE transactions(transaction_type enum('deposit', 'withdraw', 'transfer', 'interest') NOT NULL,transaction_time timestamp,from_account BIGINT NOT NULL,to_account BIGINT NOT NULL,amount numeric(25,5) NOT NULL,FOREIGN KEY(from_account) REFERENCES account(accountNumber),FOREIGN KEY(to_account) REFERENCES account(accountNumber));");
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement(
                 "CREATE TABLE latest_balances(accountNumber BIGINT NOT NULL,amount numeric(25,5),FOREIGN KEY(accountNumber) REFERENCES account(accountNumber),CHECK (amount >= 0));");
@@ -59,8 +59,13 @@ public class InitializeDao extends GeneralDao{
     private void register() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE Register (IN username VARCHAR(40),IN accountNumber BIGINT,IN password VARCHAR(40),IN first_name VARCHAR(40),IN last_name VARCHAR(40),IN national_id BIGINT,IN date_of_birth date,IN account_type enum('client','employee'),IN interest_rate numeric(4,2))\n" +
                 "BEGIN\n" +
+                "  DECLARE age float;\n" +
                 "  DECLARE salt BLOB;\n" +
                 "  DECLARE hashed_password BLOB;\n" +
+                "  SELECT TIMESTAMPDIFF(YEAR,date_of_birth,NOW()) INTO age;\n" +
+                "  IF age < 13 THEN" +
+                "    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'People under the age of 13 cannot have an account';\n" +
+                "  END IF;\n" +
                 "  CALL GenerateSaltedHashPassword(password,salt,hashed_password);\n" +
                 "  INSERT INTO account VALUES (NULL,username,accountNumber,hashed_password,salt,first_name,last_name,national_id,date_of_birth,account_type,interest_rate);\n" +
                 "  INSERT INTO latest_balances VALUES (accountNumber,0);\n" +

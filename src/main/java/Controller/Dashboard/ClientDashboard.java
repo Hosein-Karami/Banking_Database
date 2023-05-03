@@ -23,7 +23,7 @@ public class ClientDashboard extends GeneralDashboard {
         try {
             accountNumber = accountService.getAccountNumber(username);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("ERROR : " + e.getMessage());
         }
     }
 
@@ -49,7 +49,7 @@ public class ClientDashboard extends GeneralDashboard {
         try{
             System.out.println("Balance : " + accountService.getBalance(accountNumber));
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println("ERROR : " + e.getMessage());
         }
     }
 
@@ -88,7 +88,7 @@ public class ClientDashboard extends GeneralDashboard {
                 System.out.println("Done\n");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println("ERROR : " + e.getMessage());
         }
     }
 

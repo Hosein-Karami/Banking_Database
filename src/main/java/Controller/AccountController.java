@@ -29,7 +29,7 @@ public class AccountController {
             accountService.register(accountChecker.getProperAccount());
             System.out.println("You signed up successfully\n");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("ERROR : " + e.getMessage());
         }
     }
 
@@ -45,7 +45,7 @@ public class AccountController {
             else
                 System.out.println("Username or password is false\n");
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("ERROR : " + e.getMessage());
         }
     }
 
