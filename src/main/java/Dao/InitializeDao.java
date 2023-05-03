@@ -21,7 +21,7 @@ public class InitializeDao extends GeneralDao{
                 "CREATE INDEX idx_account_id ON account (accountNumber);");
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement(
-                "CREATE TABLE transactions(transaction_type enum('deposit', 'withdraw', 'transfer', 'interest') NOT NULL,transaction_time timestamp,from_account BIGINT NOT NULL,to_account BIGINT NOT NULL,amount numeric(25,5) NOT NULL,FOREIGN KEY(from_account) REFERENCES account(accountNumber),FOREIGN KEY(to_account) REFERENCES account(accountNumber));");
+                "CREATE TABLE transactions(transaction_type enum('deposit', 'withdraw', 'transfer', 'interest') NOT NULL,transaction_time timestamp,from_account BIGINT,to_account BIGINT,amount numeric(25,5) NOT NULL,FOREIGN KEY(from_account) REFERENCES account(accountNumber),FOREIGN KEY(to_account) REFERENCES account(accountNumber));");
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement(
                 "CREATE TABLE latest_balances(accountNumber BIGINT NOT NULL,amount numeric(25,5),FOREIGN KEY(accountNumber) REFERENCES account(accountNumber),CHECK (amount >= 0));");
@@ -149,26 +149,36 @@ public class InitializeDao extends GeneralDao{
     }
 
     private void depositToAccount() throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE Deposit(IN account_number BIGINT,IN deposit_amount numeric(25,5))\n" +
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE Deposit(IN account_number BIGINT,IN deposit_amount numeric(25,5),IN log_transaction BOOL)\n" +
                 "BEGIN\n" +
                 "  DECLARE now_amount numeric(25,5);\n" +
                 "  DECLARE final_amount numeric(25,5);\n" +
                 "  SELECT amount FROM latest_balances WHERE accountNumber=account_number INTO now_amount;\n" +
                 "  SET final_amount = now_amount + deposit_amount;\n" +
-                "  UPDATE latest_balances SET amount=final_amount WHERE accountNumber=account_number;\n" +
+                "  START TRANSACTION;\n" +
+                "    UPDATE latest_balances SET amount=final_amount WHERE accountNumber=account_number;\n" +
+                "    IF log_transaction = true THEN" +
+                "      INSERT INTO transactions VALUES('deposit',NOW(),NULL,account_number,deposit_amount);\n" +
+                "    END IF;\n" +
+                "  COMMIT;\n" +
                 "END;");
         preparedStatement.execute();
     }
 
     private void withdrawFromAccount() throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE Withdraw(IN account_number BIGINT,IN withdraw_amount numeric(25,5))\n" +
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE Withdraw(IN account_number BIGINT,IN withdraw_amount numeric(25,5),IN log_transaction BOOL)\n" +
                 "BEGIN\n" +
                 "  DECLARE now_amount numeric(25,5);\n" +
                 "  DECLARE final_amount numeric(25,5);\n" +
                 "  SELECT amount FROM latest_balances WHERE accountNumber=account_number INTO now_amount;\n" +
                 "  SET final_amount = now_amount - withdraw_amount;\n" +
                 "  IF final_amount >= 0 THEN\n" +
-                "    UPDATE latest_balances SET amount=final_amount WHERE accountNumber=account_number;\n" +
+                "    START TRANSACTION;\n" +
+                "      UPDATE latest_balances SET amount=final_amount WHERE accountNumber=account_number;\n" +
+                "      IF log_transaction = true THEN" +
+                "        INSERT INTO transactions VALUES('withdraw',NOW(),account_number,NULL,withdraw_amount);\n" +
+                "      END IF;\n" +
+                "    COMMIT;\n" +
                 "  ELSE" +
                 "    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Lack of balance,First increase your balance and try again';" +
                 "  END IF;\n" +
@@ -181,8 +191,9 @@ public class InitializeDao extends GeneralDao{
                 "BEGIN\n" +
                 "  START TRANSACTION;\n" +
                 "    CALL CheckAccountNumber(to_account_number);\n" +
-                "    CALL Withdraw(from_account_number,transfer_amount);\n" +
-                "    CALL Deposit(to_account_number,transfer_amount);\n" +
+                "    CALL Withdraw(from_account_number,transfer_amount,false);\n" +
+                "    CALL Deposit(to_account_number,transfer_amount,false);\n" +
+                "    INSERT INTO transactions VALUES('transfer',NOW(),from_account_number,to_account_number,transfer_amount);\n" +
                 "  COMMIT;\n" +
                 "END;");
         preparedStatement.execute();
