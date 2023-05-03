@@ -43,6 +43,7 @@ public class InitializeDao extends GeneralDao{
         depositToAccount();
         withdrawFromAccount();
         transfer();
+        interestPayments();
     }
 
     private void hashPassword() throws SQLException {
@@ -195,6 +196,14 @@ public class InitializeDao extends GeneralDao{
                 "    CALL Deposit(to_account_number,transfer_amount,false);\n" +
                 "    INSERT INTO transactions VALUES('transfer',NOW(),from_account_number,to_account_number,transfer_amount);\n" +
                 "  COMMIT;\n" +
+                "END;");
+        preparedStatement.execute();
+    }
+
+    private void interestPayments() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE InterestPayments()\n" +
+                "BEGIN\n" +
+                "  UPDATE latest_balances SET amount=(amount + ((SELECT interest_rate/100 from account WHERE latest_balances.accountNumber = account.accountNumber) * amount)) WHERE accountNumber > -1;\n" +
                 "END;");
         preparedStatement.execute();
     }

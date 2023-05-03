@@ -1,5 +1,6 @@
 package Service;
 
+import Dao.EventDao;
 import Dao.QueryRunner;
 import Dao.SnapshotDao;
 
@@ -10,6 +11,7 @@ import java.util.Scanner;
 public class EventService {
 
     private static EventService fileService = null;
+    private final EventDao eventDao = EventDao.getInstance();
     private final File file = new File("Queries.txt");
     private final QueryRunner queryRunner = QueryRunner.getInstance();
     private final SnapshotDao snapshotDao = SnapshotDao.getInstance();
@@ -34,7 +36,7 @@ public class EventService {
         }
     }
 
-    public void runEvents() throws FileNotFoundException {
+    public void runEvents() throws FileNotFoundException, SQLException {
         Scanner scanner = new Scanner(file);
         String query;
         do{
@@ -52,8 +54,9 @@ public class EventService {
             e.printStackTrace();
         }
         PrintWriter writer = new PrintWriter(file);
-            writer.print("");
-            writer.close();
+        writer.print("");
+        writer.close();
+        eventDao.interestPayments();
     }
 
 }

@@ -29,7 +29,7 @@ public class EmployeeDashboard extends GeneralDashboard {
     private void updateDatabase(){
         try {
             eventService.runEvents();
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             System.out.println("ERROR : " + e.getMessage());
         }
     }
