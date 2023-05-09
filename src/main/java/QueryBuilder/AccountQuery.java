@@ -27,7 +27,7 @@ public class AccountQuery {
         stringBuilder.append(AccountType.getType(account.getType()));
         stringBuilder.append("',");
         stringBuilder.append(account.getInterestRate());
-        stringBuilder.append(");\n");
+        stringBuilder.append(");");
         return stringBuilder.toString();
     }
 
@@ -38,7 +38,7 @@ public class AccountQuery {
         stringBuilder.append(username);
         stringBuilder.append("','");
         stringBuilder.append(timestamp);
-        stringBuilder.append("');\n");
+        stringBuilder.append("');");
         return stringBuilder.toString();
     }
 
@@ -49,7 +49,7 @@ public class AccountQuery {
         stringBuilder.append(",");
         stringBuilder.append(amount);
         stringBuilder.append(",");
-        stringBuilder.append("true);\n");
+        stringBuilder.append("true);");
         return stringBuilder.toString();
     }
 
@@ -60,7 +60,7 @@ public class AccountQuery {
         stringBuilder.append(",");
         stringBuilder.append(amount);
         stringBuilder.append(",");
-        stringBuilder.append("true);\n");
+        stringBuilder.append("true);");
         return stringBuilder.toString();
     }
 
@@ -72,7 +72,7 @@ public class AccountQuery {
         stringBuilder.append(toAccountNumber);
         stringBuilder.append(",");
         stringBuilder.append(amount);
-        stringBuilder.append(");\n");
+        stringBuilder.append(");");
         return stringBuilder.toString();
     }
 

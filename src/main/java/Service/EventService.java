@@ -6,11 +6,13 @@ import Dao.SnapshotDao;
 
 import java.io.*;
 import java.sql.SQLException;
-import java.util.Scanner;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 public class EventService {
 
     private static EventService fileService = null;
+    private final ArrayList<String> queries = new ArrayList<>();
     private final EventDao eventDao = EventDao.getInstance();
     private final File file = new File("Queries.txt");
     private final QueryRunner queryRunner = QueryRunner.getInstance();
@@ -24,39 +26,29 @@ public class EventService {
 
     private EventService() {}
 
-
     public void saveEvent(String query){
         try {
             FileWriter fileWriter = new FileWriter(file,true);
-            fileWriter.write(query);
+            fileWriter.write(query + ", Time : " + LocalDateTime.now() + "\n");
             fileWriter.flush();
             fileWriter.close();
+            queries.add(query);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void runEvents() throws FileNotFoundException, SQLException {
-        Scanner scanner = new Scanner(file);
-        String query;
-        do{
-            query = scanner.nextLine();
-            System.out.println(query);
-            try {
+    public void runEvents() throws SQLException {
+        for(String query : queries){
+            try{
                 queryRunner.run(query);
-            }catch (SQLException e){
-                System.out.println("Error : " + e.getMessage() + ", query : " + query);
+            }catch (Exception e){
+                System.out.println(e.getMessage());
             }
-        }while (scanner.hasNext());
-        try {
-            snapshotDao.logSnapshot();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        PrintWriter writer = new PrintWriter(file);
-        writer.print("");
-        writer.close();
         eventDao.interestPayments();
+        snapshotDao.logSnapshot();
+        queries.clear();
     }
 
 }
