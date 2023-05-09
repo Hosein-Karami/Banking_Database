@@ -46,9 +46,9 @@ public class EventService {
                 System.out.println(e.getMessage());
             }
         }
+        queries.clear();
         eventDao.interestPayments();
         snapshotDao.logSnapshot();
-        queries.clear();
     }
 
 }
