@@ -218,7 +218,7 @@ public class InitializeDao extends GeneralDao{
                 "      IF client_type = 'client' THEN\n" +
                 "          START TRANSACTION;\n" +
                 "              SELECT amount from latest_balances WHERE accountNumber=account_number INTO balance;\n" +
-                "              UPDATE latest_balances SET amount=(amount + (amount * (rate/100)));\n" +
+                "              UPDATE latest_balances SET amount=(amount + (balance * (rate/100)));\n" +
                 "              INSERT INTO transactions VALUES('interest',NOW(),NULL,account_number,balance * (rate/100));\n" +
                 "          COMMIT;\n" +
                 "      END IF;\n" +
