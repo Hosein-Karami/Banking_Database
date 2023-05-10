@@ -12,7 +12,7 @@ public class InitializeDao extends GeneralDao{
 
     private void makeTables() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(
-                "CREATE TABLE account(account_id varchar(16) primary key,username varchar(40) unique NOT NULL, accountNumber BIGINT,password BLOB NOT NULL,salt BLOB NOT NULL,first_name varchar(40) NOT NULL ,last_name varchar(40) NOT NULL ,national_id BIGINT NOT NULL, date_of_birth date,account_type enum('client','employee') NOT NULL,interest_rate numeric(4,2));");
+                "CREATE TABLE account(account_id varchar(16) primary key,username varchar(40) unique NOT NULL, accountNumber BIGINT unique,password BLOB NOT NULL,salt BLOB NOT NULL,first_name varchar(40) NOT NULL ,last_name varchar(40) NOT NULL ,national_id BIGINT NOT NULL unique, date_of_birth date,account_type enum('client','employee') NOT NULL,interest_rate numeric(4,2));");
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement(
                 "CREATE TABLE login_log(username varchar(40),login_time timestamp,FOREIGN KEY(username) REFERENCES account(username));");
@@ -201,36 +201,7 @@ public class InitializeDao extends GeneralDao{
     }
 
     private void interestPayments() throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE InterestPayments()\n" +
-                "BEGIN\n" +
-                "  DECLARE rows_count integer;\n" +
-                "  DECLARE counter INT DEFAULT 0;\n" +
-                "  DECLARE balance numeric(25,5);\n" +
-                "  DECLARE account_number BIGINT;\n" +
-                "  DECLARE client_type enum('client','employee');\n" +
-                "  DECLARE rate numeric(4,2);\n" +
-                "  DECLARE cur CURSOR FOR SELECT accountNumber, account_type, interest_rate FROM account;\n" +
-                "  SELECT COUNT(*) FROM account INTO rows_count;\n" +
-                "  IF rows_count > 0 THEN" +
-                "   OPEN cur;\n" +
-                "    read_loop : LOOP\n" +
-                "      FETCH cur INTO account_number,client_type,rate;\n" +
-                "      IF client_type = 'client' THEN\n" +
-                "          START TRANSACTION;\n" +
-                "              SELECT amount from latest_balances WHERE accountNumber=account_number INTO balance;\n" +
-                "              UPDATE latest_balances SET amount=(amount + (balance * (rate/100)));\n" +
-                "              INSERT INTO transactions VALUES('interest',NOW(),NULL,account_number,balance * (rate/100));\n" +
-                "          COMMIT;\n" +
-                "      END IF;\n" +
-                "     SET counter = counter + 1;\n" +
-                "     IF counter = rows_count THEN" +
-                "       LEAVE read_loop;\n" +
-                "     END IF;\n" +
-                "    END LOOP;\n" +
-                "   CLOSE cur;\n" +
-                "  END IF;\n" +
-                "END;");
-        preparedStatement.execute();
+
     }
 
 }
