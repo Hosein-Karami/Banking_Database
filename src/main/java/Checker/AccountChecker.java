@@ -28,16 +28,24 @@ public class AccountChecker {
         String firstname = getProperStringInformation(40);
         System.out.print("Enter lastname(length of lastname should between 1 and 40) : ");
         String lastname = getProperStringInformation(40);
-        System.out.print("Enter account number(16 digit number) : ");
-        long accountNumber = getProperLongInformation(16);
+        AccountType accountType = getProperType();
+        long accountNumber;
+        double interestRate;
+        if(accountType == AccountType.client) {
+            System.out.print("Enter account number(16 digit number) : ");
+            accountNumber = getProperLongInformation(16);
+            System.out.print("Enter interest rate : ");
+            interestRate = getProperInterestRate();
+        }
+        else{
+            accountNumber = 0L;
+            interestRate = 0.0;
+        }
         System.out.print("Enter your national_id : ");
         long national_id = getProperLongInformation(10);
         scanner.nextLine();
         System.out.print("Enter your birthdate(yyyy-mm-dd) : ");
         String birthdate = getProperDate();
-        AccountType accountType = getProperType();
-        System.out.print("Enter interest rate : ");
-        double interestRate = getProperInterestRate();
         return new Account(username,password,accountNumber,firstname,lastname,national_id,birthdate,accountType,interestRate);
     }
 

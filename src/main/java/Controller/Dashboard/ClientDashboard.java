@@ -31,7 +31,7 @@ public class ClientDashboard extends GeneralDashboard {
         int choice;
         while (true){
             System.out.println("\n1)Check balance\n2)Deposit\n3)Withdraw\n4)Transfer\n5)Logout\n");
-            choice = NumberChecker.getProperNumber(1,6);
+            choice = NumberChecker.getProperNumber(1,5);
             if(choice == 1)
                 checkBalance();
             else if(choice == 2)

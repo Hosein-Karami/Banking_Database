@@ -68,8 +68,14 @@ public class InitializeDao extends GeneralDao{
                 "    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'People under the age of 13 cannot have an account';\n" +
                 "  END IF;\n" +
                 "  CALL GenerateSaltedHashPassword(password,salt,hashed_password);\n" +
-                "  INSERT INTO account VALUES (NULL,username,accountNumber,hashed_password,salt,first_name,last_name,national_id,date_of_birth,account_type,interest_rate);\n" +
-                "  INSERT INTO latest_balances VALUES (accountNumber,0);\n" +
+                "  IF account_type = 'client' THEN\n" +
+                "     INSERT INTO account VALUES (NULL,username,accountNumber,hashed_password,salt,first_name,last_name,national_id,date_of_birth,account_type,interest_rate);\n" +
+                "  ELSE\n" +
+                "     INSERT INTO account VALUES (NULL,username,NULL,hashed_password,salt,first_name,last_name,national_id,date_of_birth,account_type,NULL);\n" +
+                "  END IF;\n" +
+                "  IF account_type = 'client' THEN\n" +
+                "      INSERT INTO latest_balances VALUES (accountNumber,0);\n" +
+                "  END IF;\n" +
                 "END;");
         preparedStatement.execute();
         preparedStatement = connection.prepareStatement("CREATE TRIGGER generate_user_id\n" +
