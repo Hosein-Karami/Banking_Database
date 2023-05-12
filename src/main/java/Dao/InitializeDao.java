@@ -70,7 +70,7 @@ public class InitializeDao extends GeneralDao{
                 "  CALL GenerateSaltedHashPassword(password,salt,hashed_password);\n" +
                 "  IF account_type = 'client' THEN\n" +
                 "     INSERT INTO account VALUES (NULL,username,accountNumber,hashed_password,salt,first_name,last_name,national_id,date_of_birth,account_type,interest_rate);\n" +
-                "  ELSE\n" +
+                "  ELSE" +
                 "     INSERT INTO account VALUES (NULL,username,NULL,hashed_password,salt,first_name,last_name,national_id,date_of_birth,account_type,NULL);\n" +
                 "  END IF;\n" +
                 "  IF account_type = 'client' THEN\n" +
@@ -207,7 +207,17 @@ public class InitializeDao extends GeneralDao{
     }
 
     private void interestPayments() throws SQLException {
-
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE InterestPayments()\n" +
+                "BEGIN\n" +
+                "   INSERT INTO transactions (transaction_type, transaction_time, from_account, to_account, amount)\n" +
+                "      SELECT 'interest', NOW(), NULL, ac.accountNumber, amount * (ac.interest_rate/100) " +
+                "        FROM latest_balances lb join account ac on lb.accountNumber=ac.accountNumber" +
+                "          WHERE ac.accountNumber IN (SELECT accountNumber FROM account WHERE account_type = 'client');\n" +
+                "   UPDATE latest_balances SET amount = amount + (amount * (SELECT interest_rate/100 from account WHERE account.accountNumber=latest_balances.accountNumber))" +
+                "      WHERE accountNumber IN " +
+                "          (SELECT accountNumber FROM account WHERE account_type = 'client');\n" +
+                "END;");
+        preparedStatement.execute();
     }
 
 }

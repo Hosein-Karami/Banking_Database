@@ -7,7 +7,6 @@ import Dao.SnapshotDao;
 import java.io.*;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class EventService {
@@ -50,15 +49,15 @@ public class EventService {
                 query = scanner.nextLine();
                 queryRunner.run(query);
             }catch (SQLException sqlException){
-                System.out.println("Error : " + sqlException.getMessage() + ", query : " + query);
+                sqlException.printStackTrace();
             }
         }
-        eventDao.interestPayments();
-        snapshotDao.logSnapshot();
         FileWriter fileWriter = new FileWriter(queryFile);
         fileWriter.write("");
         fileWriter.flush();
         fileWriter.close();
+        eventDao.interestPayments();
+        snapshotDao.logSnapshot();
     }
 
 }

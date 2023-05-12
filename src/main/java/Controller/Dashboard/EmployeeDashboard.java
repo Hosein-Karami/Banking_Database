@@ -28,7 +28,7 @@ public class EmployeeDashboard extends GeneralDashboard {
         try {
             eventService.runEvents();
         } catch (Exception e) {
-            System.out.println("ERROR : " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
