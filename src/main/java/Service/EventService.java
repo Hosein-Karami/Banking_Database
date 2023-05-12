@@ -37,7 +37,7 @@ public class EventService {
             fileWriter_2.flush();
             fileWriter_2.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error : " + e.getMessage());
         }
     }
 
@@ -49,7 +49,7 @@ public class EventService {
                 query = scanner.nextLine();
                 queryRunner.run(query);
             }catch (SQLException sqlException){
-                sqlException.printStackTrace();
+                System.out.println("Error : " + sqlException.getMessage() + ", query : " + query);
             }
         }
         FileWriter fileWriter = new FileWriter(queryFile);
