@@ -58,6 +58,7 @@ public class EventService {
         fileWriter.close();
         eventDao.interestPayments();
         snapshotDao.logSnapshot();
+        snapshotDao.createSnapshotTable();
     }
 
 }

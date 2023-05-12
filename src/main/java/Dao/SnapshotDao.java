@@ -20,4 +20,9 @@ public class SnapshotDao extends GeneralDao{
         preparedStatement.execute();
     }
 
+    public void createSnapshotTable() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CALL CreateSnapshotTable();");
+        preparedStatement.execute();
+    }
+
 }

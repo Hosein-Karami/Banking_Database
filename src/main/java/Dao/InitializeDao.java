@@ -44,6 +44,7 @@ public class InitializeDao extends GeneralDao{
         withdrawFromAccount();
         transfer();
         interestPayments();
+        create_snapshot_table();
     }
 
     private void hashPassword() throws SQLException {
@@ -216,6 +217,23 @@ public class InitializeDao extends GeneralDao{
                 "   UPDATE latest_balances SET amount = amount + (amount * (SELECT interest_rate/100 from account WHERE account.accountNumber=latest_balances.accountNumber))" +
                 "      WHERE accountNumber IN " +
                 "          (SELECT accountNumber FROM account WHERE account_type = 'client');\n" +
+                "END;");
+        preparedStatement.execute();
+    }
+
+    private void create_snapshot_table() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE CreateSnapshotTable()\n" +
+                "BEGIN\n" +
+                "   DECLARE id integer;\n" +
+                "   DECLARE new_table_name varchar(14);\n" +
+                "   SELECT count(*) FROM snapshot_log INTO id;\n" +
+                "   SET new_table_name = (SELECT CONCAT('snapshot_', id));\n" +
+                "   SET @stmt = CONCAT('CREATE TABLE ', new_table_name, ' (accountNumber BIGINT, amount numeric(25,5))');\n" +
+                "   PREPARE create_table_stmt FROM @stmt;\n" +
+                "   EXECUTE create_table_stmt;\n" +
+                "   SET @stmt = CONCAT('INSERT INTO ', new_table_name, ' (SELECT * FROM latest_balances);');\n" +
+                "   PREPARE insert_table_stmt FROM @stmt;\n" +
+                "   EXECUTE insert_table_stmt;\n" +
                 "END;");
         preparedStatement.execute();
     }
