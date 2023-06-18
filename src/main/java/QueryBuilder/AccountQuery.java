@@ -48,8 +48,7 @@ public class AccountQuery {
         stringBuilder.append(accountNumber);
         stringBuilder.append(",");
         stringBuilder.append(amount);
-        stringBuilder.append(",");
-        stringBuilder.append("true);");
+        stringBuilder.append(");");
         return stringBuilder.toString();
     }
 
@@ -59,8 +58,7 @@ public class AccountQuery {
         stringBuilder.append(accountNumber);
         stringBuilder.append(",");
         stringBuilder.append(amount);
-        stringBuilder.append(",");
-        stringBuilder.append("true);");
+        stringBuilder.append(");");
         return stringBuilder.toString();
     }
 

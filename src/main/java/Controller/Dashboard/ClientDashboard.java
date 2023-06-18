@@ -2,7 +2,6 @@ package Controller.Dashboard;
 
 import Checker.AccountChecker;
 import Checker.NumberChecker;
-import QueryBuilder.AccountQuery;
 import Service.AccountService;
 import Service.EventService;
 
@@ -56,22 +55,30 @@ public class ClientDashboard extends GeneralDashboard {
     private void deposit(){
         System.out.print("Enter amount : ");
         double amount = scanner.nextDouble();
-        if(amount < 0)
-            System.out.println("Invalid amount");
-        else{
-            eventService.saveEvent(AccountQuery.deposit(accountNumber,amount));
-            System.out.println("Done\n");
+        try {
+            if (amount < 0)
+                System.out.println("Invalid amount");
+            else {
+                eventService.saveDepositEvent(accountNumber, amount);
+                System.out.println("Done\n");
+            }
+        }catch (Exception e){
+            System.out.println("ERROR : " + e.getMessage());
         }
     }
 
     private void withdraw(){
         System.out.print("Enter amount : ");
         double amount = scanner.nextDouble();
-        if(amount < 0)
-            System.out.println("Invalid amount");
-        else{
-            eventService.saveEvent(AccountQuery.withdraw(accountNumber,amount));
-            System.out.println("Done\n");
+        try {
+            if (amount < 0)
+                System.out.println("Invalid amount");
+            else {
+                eventService.saveWithdrawEvent(accountNumber, amount);
+                System.out.println("Done\n");
+            }
+        }catch (Exception e){
+            System.out.println("ERROR : " + e.getMessage());
         }
     }
 
@@ -84,7 +91,7 @@ public class ClientDashboard extends GeneralDashboard {
             if (amount < 0)
                 System.out.println("Invalid amount");
             else {
-                eventService.saveEvent(AccountQuery.transfer(accountNumber, targetAccountNumber, amount));
+                eventService.saveTransferEvent(accountNumber,targetAccountNumber,amount);
                 System.out.println("Done\n");
             }
         }catch (Exception e){
