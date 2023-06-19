@@ -29,7 +29,6 @@ public class InitializeDao extends GeneralDao{
         preparedStatement = connection.prepareStatement(
                 "CREATE TABLE snapshot_log(snapshot_id integer auto_increment primary key,snapshot_timestamp timestamp);");
         preparedStatement.execute();
-        preparedStatement = null;
     }
 
     private void makeProcedures() throws SQLException {
