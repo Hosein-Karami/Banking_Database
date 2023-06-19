@@ -15,11 +15,6 @@ public class EventDao extends GeneralDao {
 
     private EventDao() {}
 
-    public void interestPayments() throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("CALL InterestPayments();");
-        preparedStatement.execute();
-    }
-
     public void saveDepositEvent(long accountNumber,double amount) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("CALL DepositEvent(?,?)");
         preparedStatement.setLong(1,accountNumber);
