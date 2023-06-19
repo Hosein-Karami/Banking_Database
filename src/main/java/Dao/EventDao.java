@@ -1,9 +1,7 @@
 package Dao;
 
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
+import java.util.Objects;
 
 public class EventDao extends GeneralDao {
 
@@ -15,12 +13,12 @@ public class EventDao extends GeneralDao {
         return eventDao;
     }
 
-    private EventDao() {
-    }
+    private EventDao() {}
 
     public void interestPayments() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("CALL InterestPayments();");
         preparedStatement.execute();
+        preparedStatement = null;
     }
 
     public void saveDepositEvent(long accountNumber,double amount) throws SQLException {
@@ -28,6 +26,7 @@ public class EventDao extends GeneralDao {
         preparedStatement.setLong(1,accountNumber);
         preparedStatement.setDouble(2,amount);
         preparedStatement.execute();
+        preparedStatement = null;
     }
 
     public void saveWithdrawEvent(long accountNumber,double amount) throws SQLException {
@@ -35,6 +34,7 @@ public class EventDao extends GeneralDao {
         preparedStatement.setLong(1,accountNumber);
         preparedStatement.setDouble(2,amount);
         preparedStatement.execute();
+        preparedStatement = null;
     }
 
     public void saveTransferEvent(long from,long to,double amount) throws SQLException {
@@ -43,15 +43,54 @@ public class EventDao extends GeneralDao {
         preparedStatement.setLong(2,to);
         preparedStatement.setDouble(3,amount);
         preparedStatement.execute();
+        preparedStatement = null;
     }
 
     public void runEvents() throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("CALL RunDepositEvents();");
-        preparedStatement.execute();
-        preparedStatement = connection.prepareStatement("CALL RunWithdrawEvents();");
-        preparedStatement.execute();
-        preparedStatement = connection.prepareStatement("CALL RunTransferEvents();");
-        preparedStatement.execute();
+        String transactionType;
+        long fromAccount;
+        long toAccount;
+        double amount;
+        PreparedStatement preparedStatement = null;
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM transactions WHERE ((transaction_time >= " +
+                                                               "(SELECT snapshot_timestamp FROM snapshot_log " +
+                "                                                    WHERE snapshot_id=(SELECT MAX(snapshot_id) FROM snapshot_log))) or (SELECT COUNT(*) FROM snapshot_log) = 0);");
+        while (resultSet.next()) {
+            try {
+                transactionType = resultSet.getString(1);
+                amount = resultSet.getDouble(5);
+                switch (transactionType) {
+                    case "deposit":
+                        toAccount = resultSet.getLong(4);
+                        preparedStatement = connection.prepareStatement("CALL Deposit(?,?)");
+                        preparedStatement.setLong(1, toAccount);
+                        preparedStatement.setDouble(2, amount);
+                        break;
+                    case "withdraw":
+                        fromAccount = resultSet.getLong(3);
+                        preparedStatement = connection.prepareStatement("CALL Withdraw(?,?)");
+                        preparedStatement.setLong(1, fromAccount);
+                        preparedStatement.setDouble(2, amount);
+                        break;
+                    case "transfer":
+                        toAccount = resultSet.getLong(4);
+                        fromAccount = resultSet.getLong(3);
+                        preparedStatement = connection.prepareStatement("CALL Transfer(?,?,?)");
+                        preparedStatement.setLong(1, fromAccount);
+                        preparedStatement.setLong(2, toAccount);
+                        preparedStatement.setDouble(3, amount);
+                        break;
+                }
+                Objects.requireNonNull(preparedStatement).execute();
+            }catch (Exception e){
+                e.printStackTrace();
+                //System.out.println("ERROR : " + e.getMessage());
+            }
+        }
+        preparedStatement = null;
+        statement = null;
+        resultSet = null;
     }
 
 }

@@ -33,7 +33,7 @@ public class EventService {
 
     public void runEvents() throws SQLException {
         eventDao.runEvents();
-        eventDao.interestPayments();
+        //eventDao.interestPayments();
         snapshotDao.logSnapshot();
         snapshotDao.createSnapshotTable();
     }

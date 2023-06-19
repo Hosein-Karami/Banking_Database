@@ -220,8 +220,8 @@ public class InitializeDao extends GeneralDao{
                 "BEGIN\n" +
                 "  START TRANSACTION;\n" +
                 "    CALL CheckAccountNumber(to_account_number);\n" +
-                "    CALL Withdraw(from_account_number,transfer_amount,false);\n" +
-                "    CALL Deposit(to_account_number,transfer_amount,false);\n" +
+                "    CALL Withdraw(from_account_number,transfer_amount);\n" +
+                "    CALL Deposit(to_account_number,transfer_amount);\n" +
                 "  COMMIT;\n" +
                 "END;");
         preparedStatement.execute();
