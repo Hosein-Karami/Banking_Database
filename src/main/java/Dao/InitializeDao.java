@@ -29,6 +29,7 @@ public class InitializeDao extends GeneralDao{
         preparedStatement = connection.prepareStatement(
                 "CREATE TABLE snapshot_log(snapshot_id integer auto_increment primary key,snapshot_timestamp timestamp);");
         preparedStatement.execute();
+        preparedStatement = null;
     }
 
     private void makeProcedures() throws SQLException {
@@ -46,6 +47,7 @@ public class InitializeDao extends GeneralDao{
         withdrawFromAccount();
         saveTransferEvent();
         transfer();
+        saveInterestEvent();
         interestPayments();
         create_snapshot_table();
     }
@@ -227,16 +229,20 @@ public class InitializeDao extends GeneralDao{
         preparedStatement.execute();
     }
 
-    private void interestPayments() throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE InterestPayments()\n" +
+    private void saveInterestEvent() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE SaveInterestEvent(IN account_number BIGINT)\n" +
                 "BEGIN\n" +
-                "   INSERT INTO transactions (transaction_type, transaction_time, from_account, to_account, amount)\n" +
-                "      SELECT 'interest', NOW(), NULL, ac.accountNumber, amount * (ac.interest_rate/100) " +
-                "          FROM latest_balances lb join account ac on lb.accountNumber=ac.accountNumber" +
-                "             WHERE ac.accountNumber IN (SELECT accountNumber FROM account WHERE account_type = 'client');\n" +
-                "   UPDATE latest_balances SET amount = amount + (amount * (SELECT interest_rate/100 from account WHERE account.accountNumber=latest_balances.accountNumber))" +
-                "      WHERE accountNumber IN " +
-                "          (SELECT accountNumber FROM account WHERE account_type = 'client');\n" +
+                "  DECLARE interest_amount numeric(25,5);\n" +
+                "  SET interest_amount = ((SELECT amount FROM latest_balances WHERE accountNumber = account_number) * (SELECT interest_rate/100 FROM account WHERE accountNumber = account_number));\n" +
+                "  INSERT INTO transactions VALUES('interest',NOW(),NULL,account_number,interest_amount);\n" +
+                "END;");
+        preparedStatement.execute();
+    }
+
+    private void interestPayments() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE PROCEDURE Interest(IN account_number BIGINT,IN interest_amount numeric(25,5))\n" +
+                "BEGIN\n" +
+                "   UPDATE latest_balances SET amount = amount + interest_amount WHERE accountNumber = account_number;\n" +
                 "END;");
         preparedStatement.execute();
     }

@@ -18,7 +18,6 @@ public class EventDao extends GeneralDao {
     public void interestPayments() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("CALL InterestPayments();");
         preparedStatement.execute();
-        preparedStatement = null;
     }
 
     public void saveDepositEvent(long accountNumber,double amount) throws SQLException {
@@ -26,7 +25,6 @@ public class EventDao extends GeneralDao {
         preparedStatement.setLong(1,accountNumber);
         preparedStatement.setDouble(2,amount);
         preparedStatement.execute();
-        preparedStatement = null;
     }
 
     public void saveWithdrawEvent(long accountNumber,double amount) throws SQLException {
@@ -34,7 +32,6 @@ public class EventDao extends GeneralDao {
         preparedStatement.setLong(1,accountNumber);
         preparedStatement.setDouble(2,amount);
         preparedStatement.execute();
-        preparedStatement = null;
     }
 
     public void saveTransferEvent(long from,long to,double amount) throws SQLException {
@@ -43,7 +40,12 @@ public class EventDao extends GeneralDao {
         preparedStatement.setLong(2,to);
         preparedStatement.setDouble(3,amount);
         preparedStatement.execute();
-        preparedStatement = null;
+    }
+
+    public void saveInterestEvent(long accountNumber) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CALL SaveInterestEvent(?);");
+        preparedStatement.setLong(1,accountNumber);
+        preparedStatement.execute();
     }
 
     public void runEvents() throws SQLException {
@@ -81,16 +83,18 @@ public class EventDao extends GeneralDao {
                         preparedStatement.setLong(2, toAccount);
                         preparedStatement.setDouble(3, amount);
                         break;
+                    case "interest":
+                        toAccount = resultSet.getLong(4);
+                        preparedStatement = connection.prepareStatement("CALL Interest(?,?)");
+                        preparedStatement.setLong(1, toAccount);
+                        preparedStatement.setDouble(2, amount);
+                        break;
                 }
                 Objects.requireNonNull(preparedStatement).execute();
             }catch (Exception e){
-                e.printStackTrace();
-                //System.out.println("ERROR : " + e.getMessage());
+                System.out.println("ERROR : " + e.getMessage());
             }
         }
-        preparedStatement = null;
-        statement = null;
-        resultSet = null;
     }
 
 }

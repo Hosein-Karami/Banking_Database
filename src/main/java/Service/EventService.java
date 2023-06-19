@@ -31,9 +31,12 @@ public class EventService {
         eventDao.saveTransferEvent(from,to,amount);
     }
 
+    public void saveInterestEvent(long accountNumber) throws SQLException {
+        eventDao.saveInterestEvent(accountNumber);
+    }
+
     public void runEvents() throws SQLException {
         eventDao.runEvents();
-        //eventDao.interestPayments();
         snapshotDao.logSnapshot();
         snapshotDao.createSnapshotTable();
     }
