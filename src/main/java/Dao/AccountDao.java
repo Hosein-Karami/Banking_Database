@@ -14,8 +14,7 @@ public class AccountDao extends GeneralDao {
         return accountDao;
     }
 
-    private AccountDao() {
-    }
+    private AccountDao() {}
 
     public boolean checkPassword(String username, String password) throws SQLException {
         CallableStatement statement = connection.prepareCall("CALL CheckPassword(?,?,?);");
