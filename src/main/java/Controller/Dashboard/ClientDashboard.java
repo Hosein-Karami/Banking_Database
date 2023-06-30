@@ -29,8 +29,8 @@ public class ClientDashboard extends GeneralDashboard {
     public void run(){
         int choice;
         while (true){
-            System.out.println("\n1)Check balance\n2)Deposit\n3)Withdraw\n4)Transfer\n5)Interest\n6)Logout\n");
-            choice = NumberChecker.getProperNumber(1,6);
+            System.out.println("\n1)Check balance\n2)Deposit\n3)Withdraw\n4)Transfer\n5)Logout\n");
+            choice = NumberChecker.getProperNumber(1,5);
             if(choice == 1)
                 checkBalance();
             else if(choice == 2)
@@ -39,8 +39,6 @@ public class ClientDashboard extends GeneralDashboard {
                 withdraw();
             else if(choice == 4)
                 transfer();
-            else if(choice == 5)
-                interest();
             else
                 break;
         }
@@ -96,15 +94,6 @@ public class ClientDashboard extends GeneralDashboard {
                 eventService.saveTransferEvent(accountNumber,targetAccountNumber,amount);
                 System.out.println("Done\n");
             }
-        }catch (Exception e){
-            System.out.println("ERROR : " + e.getMessage());
-        }
-    }
-
-    private void interest(){
-        try {
-            eventService.saveInterestEvent(accountNumber);
-            System.out.println("Done\n");
         }catch (Exception e){
             System.out.println("ERROR : " + e.getMessage());
         }
